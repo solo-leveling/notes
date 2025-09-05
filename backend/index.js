@@ -3,6 +3,7 @@ const express = require("express");
 const connectToDB = require("./src/database/db");
 const homeRoutes = require("./src/routes/homeRoutes");
 const registerRoutes = require("./src/routes/registerRoutes");
+const loginRoutes = require("./src/routes/loginRoutes");
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 //routes
 app.use(registerRoutes);
+app.use(loginRoutes);
 
 //get port from .env
 const PORT = process.env.PORT || 8001;
