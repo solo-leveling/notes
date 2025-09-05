@@ -1,56 +1,30 @@
 require("dotenv").config();
-
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
-const config = require("./config.json");
-const jwt = require("jsonwebtoken");
-
-mongoose.connect(config.connectionString);
+const connectToDB = require("./db");
 
 const app = express();
 
+// Middleware
 app.use(express.json());
+app.use(cors({ origin: "*" }));
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+// Connect to database
+connectToDB();
 
+// Routes
 app.get("/", (req, res) => {
-  res.json({ data: "hello, welcome aa" });
-  //   res.send("Hello");
-});
-app.post("/create-account", async (res, req) => {
-  const { fullName, email, password } = req.body;
-
-  if (!fullName) {
-    res.status(400).json({
-      error: true,
-      message: "Something went wrong with name",
-    });
-  }
-
-  if (!email) {
-    res.status(400).json({
-      error: true,
-      message: "Something went wrong with email",
-    });
-  }
-
-  if (!password) {
-    res.status(400).json({
-      error: true,
-      message: "Something went wrong with password",
-    });
-  }
+  res.json({ data: "hello, welcome" });
 });
 
-const PORT = 8000;
+// Import user routes
+const userRoutes = require("./routes/userRoutes");
+app.use("/api/users", userRoutes);
 
+// Start server
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
-  console.log(`server is connected successfully at port ${PORT}`);
+  console.log(`Server is running at port ${PORT}`);
 });
 
 module.exports = app;
