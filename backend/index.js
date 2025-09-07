@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 //routes
 app.use(registerRoutes);
 app.use(loginRoutes);
+app.use(homeRoutes);
 
 //get port from .env
 const PORT = process.env.PORT || 8001;
