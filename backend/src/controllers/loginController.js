@@ -23,7 +23,7 @@ const loginUser = async (req, res) => {
     if (!user) {
       res.status(400).json({
         success: false,
-        message: "Username is incorrect",
+        message: "Username is not found",
       });
     }
 
