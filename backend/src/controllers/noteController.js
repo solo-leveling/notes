@@ -45,4 +45,34 @@ const addNote = async (req, res) => {
   }
 };
 
-module.exports = { addNote };
+//edit note
+const editNote = async (req, res) => {
+  try {
+    const getNoteData = req.body;
+    const getNoteId = req.params.id;
+    const updateNote = await Note.findByIdAndUpdate(getNoteId, getNoteData, {
+      new: true,
+    });
+    console.log(updateNote);
+    if (updateNote) {
+      res.status(200).json({
+        success: true,
+        message: "Note is updated successfully.",
+        data: updateNote,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Error Updating Note",
+      });
+    }
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong!Please try again.",
+      error: e.message,
+    });
+  }
+};
+
+module.exports = { addNote, editNote };
