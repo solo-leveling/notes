@@ -50,6 +50,16 @@ const editNote = async (req, res) => {
   try {
     const getNoteData = req.body;
     const getNoteId = req.params.id;
+    const userId = req.userInfo.userId;
+    const note = await Note.findById(getNoteId);
+
+    if (note.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You can't edit other ppl note.",
+      });
+    }
+
     const updateNote = await Note.findByIdAndUpdate(getNoteId, getNoteData, {
       new: true,
     });
@@ -79,6 +89,16 @@ const editNote = async (req, res) => {
 const deleteNote = async (req, res) => {
   try {
     const getNoteId = req.params.id;
+    const userId = req.userInfo.userId;
+    const note = await Note.findById(getNoteId);
+
+    if (note.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You can't delete other ppl note.",
+      });
+    }
+
     const deleteData = await Note.findByIdAndDelete(getNoteId);
 
     if (deleteData) {
@@ -103,7 +123,10 @@ const deleteNote = async (req, res) => {
 
 const showAllNotes = async (req, res) => {
   try {
-    const getAllNotes = await Note.find({});
+    const getAllNotes = await Note.find({ userId: req.userInfo.userId }).sort({
+      isPinned: -1,
+    });
+    console.log(getAllNotes);
     if (getAllNotes) {
       return res.status(200).json({
         error: false,
@@ -124,4 +147,43 @@ const showAllNotes = async (req, res) => {
   }
 };
 
-module.exports = { addNote, editNote, deleteNote, showAllNotes };
+const updatePinned = async (req, res) => {
+  try {
+    const getNoteData = req.body;
+    const getNoteId = req.params.id;
+    const userId = req.userInfo.userId;
+    const note = await Note.findById(getNoteId);
+
+    if (note.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You can't edit other ppl note.",
+      });
+    }
+
+    const updateNote = await Note.findByIdAndUpdate(getNoteId, getNoteData, {
+      new: true,
+    });
+    console.log(updateNote);
+    if (updateNote) {
+      res.status(200).json({
+        success: true,
+        message: "Pin is updated successfully.",
+        data: updateNote,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Error Updating Pinned",
+      });
+    }
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong!Please try again.",
+      error: e.message,
+    });
+  }
+};
+
+module.exports = { addNote, editNote, deleteNote, showAllNotes, updatePinned };
