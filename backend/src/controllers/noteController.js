@@ -75,4 +75,53 @@ const editNote = async (req, res) => {
   }
 };
 
-module.exports = { addNote, editNote };
+//delete note
+const deleteNote = async (req, res) => {
+  try {
+    const getNoteId = req.params.id;
+    const deleteData = await Note.findByIdAndDelete(getNoteId);
+
+    if (deleteData) {
+      return res.status(200).json({
+        error: false,
+        data: deleteData,
+        message: "Note deleted successfully.",
+      });
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "Can't find data.",
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server error.",
+    });
+  }
+};
+
+const showAllNotes = async (req, res) => {
+  try {
+    const getAllNotes = await Note.find({});
+    if (getAllNotes) {
+      return res.status(200).json({
+        error: false,
+        data: getAllNotes,
+        message: "All notes",
+      });
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "Can't find data.",
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server error.",
+    });
+  }
+};
+
+module.exports = { addNote, editNote, deleteNote, showAllNotes };
