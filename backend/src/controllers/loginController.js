@@ -4,32 +4,28 @@ const User = require("../models/User");
 
 const loginUser = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username) {
-      res.status(400).json({
+    const { username, email, password } = req.body;
+    if ((!username && !email) || !password) {
+      return res.status(400).json({
         success: false,
-        message: "Username is required",
+        message: "Username or email and password are required",
       });
     }
 
-    if (!password) {
-      res.status(400).json({
-        success: false,
-        message: "Password is required",
-      });
-    }
-
-    const user = await User.findOne({ username });
+    // Find user by username or email
+    const user = await User.findOne({
+      $or: [username ? { username } : {}, email ? { email } : {}],
+    });
     if (!user) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
-        message: "Username is not found",
+        message: "User not found",
       });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Password is incorrect",
       });

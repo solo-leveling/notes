@@ -4,11 +4,13 @@ const connectToDB = require("./src/database/db");
 const homeRoutes = require("./src/routes/homeRoutes");
 const registerRoutes = require("./src/routes/registerRoutes");
 const loginRoutes = require("./src/routes/loginRoutes");
+const cors = require("cors");
 
 const app = express();
 
 //middleware
 app.use(express.json());
+app.use(cors({ origin: "*" }));
 
 //connect to database
 connectToDB();
