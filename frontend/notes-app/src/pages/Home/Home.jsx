@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar/Navbar'
 import NoteCard from '../../components/Cards/NoteCard'
 import { MdAdd } from 'react-icons/md'
 import AddEditNote from './AddEditNote'
 import  Modal  from 'react-modal'
+import axiosInstance from '../../utils/axiosInstance'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
     const [openAddEditModal, setAddEditModal] = useState({
@@ -11,10 +13,32 @@ const Home = () => {
         type: "add",
         data: null
     })
+    const [userInfo, setUserInfo] = useState(null)
+    const navigate = useNavigate()
+
+    const getUserInfo = async () => {
+        try {
+            const response = await axiosInstance.get("/get-user")
+            if (response.data && response.data.user) {
+                setUserInfo(response.data.user)
+            }
+        } catch (e) {
+            if (e.response.status === 401) {
+                localStorage.clear();
+                navigate("/login")
+            }
+
+        } 
+    }
+
+    useEffect(() => {
+        getUserInfo()
+        return () => {}
+    }, [])
 
     return (
         <>
-            <Navbar />
+            <Navbar userInfo={userInfo} />
             <div className='container mx-auto px-10 py-10'>
                 <div className='grid grid-cols-3 gap-4'>
                 <NoteCard title="Part Time Job" date="2025/09/03" content="Ramen Shop" tags="#17:00" isPinned={true}

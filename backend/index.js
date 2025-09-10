@@ -4,6 +4,7 @@ const connectToDB = require("./src/database/db");
 const homeRoutes = require("./src/routes/homeRoutes");
 const registerRoutes = require("./src/routes/registerRoutes");
 const loginRoutes = require("./src/routes/loginRoutes");
+const userRoutes = require("./src/routes/userRoutes");
 const cors = require("cors");
 
 const app = express();
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 app.use(registerRoutes);
 app.use(loginRoutes);
 app.use(homeRoutes);
+app.use(userRoutes);
 
 //get port from .env
 const PORT = process.env.PORT || 8001;
