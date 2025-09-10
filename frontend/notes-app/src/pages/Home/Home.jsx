@@ -17,6 +17,29 @@ const Home = () => {
     const [getNotes, setAllNotes] = useState([])
     const navigate = useNavigate()
 
+    //handle edit note
+    const handleEditNote = (noteDetail) => {
+        setAddEditModal({isShown: true, type:"edit", data:noteDetail})
+    }
+
+    //handle delete note
+    const handleDeleteNote = async () => {
+        try {
+            const noteId = noteData._id
+            const response = await axiosInstance.delete("/delete-note/"+ noteId )
+            if (response.data && response.data.user) {
+                setUserInfo(response.data.user)
+            }
+        } catch (e) {
+            if (e.response.status === 401) {
+                localStorage.clear();
+                navigate("/login")
+            }
+
+        } 
+    }
+
+    //get user info
     const getUserInfo = async () => {
         try {
             const response = await axiosInstance.get("/get-user")
@@ -63,7 +86,7 @@ const Home = () => {
                         content={item.content}
                         tags={item.tags}
                         isPinned={item.isPinned}
-                        onEdit={() => { }}
+                        onEdit={() => handleEditNote(item)}
                         onDelete={() => { }}
                         OnPinNote={() => { }}
                     />

@@ -5,19 +5,19 @@ import axiosInstance from '../../utils/axiosInstance'
 
 const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
 
-    const [title, setTitle] = useState("")
-    const [content, setContent] = useState("")
-    const [tags, setTags] = useState([])
+    const [title, setTitle] = useState(noteData?.title || "")
+    const [content, setContent] = useState(noteData?.content || "")
+    const [tags, setTags] = useState(noteData?.tags || [])
     const [error, setError] = useState(null)
 
     //Add Note
     const addNewNote = async () => {
         try {
-            const response = await axiosInstance.post("add-note", {
+            const response = await axiosInstance.post("/add-note", {
                 title, content, tags
             })
             if (response.data && response.data.note) {
-                getAllNotes(),
+                getAllNotes();
                 onClose()    
             }
         } catch (e) {
@@ -30,7 +30,24 @@ const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
 
     }
     //Edit Note
-    const editNote = async () => { }
+    const editNote = async () => { 
+        const noteId = noteData._id
+        try {
+            const response = await axiosInstance.put("/edit-note/" + noteId, {
+                title, content, tags
+            })
+            if (response.data && response.data.data) {
+                getAllNotes();
+                onClose()    
+            }
+        } catch (e) {
+                if (error.response && error.response.data && error.response.data.message) {
+                    setError(error.response.data.message)
+                } else {
+                    setError("An unexpected error occurred. Please try again.")
+                }
+        }
+    }
     
     const handleAddNote = () => {
         if (!title) {
@@ -79,7 +96,7 @@ const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
             {error && <p className='text-red-500 text-xs pt-4'>{ error }</p>}
 
             <button className='btn-primary font-medium mt-5 p-3' onClick={handleAddNote}>
-                Add
+                { type === 'edit' ? 'UPDATE' : 'ADD' }
             </button>
         </div>
     )
