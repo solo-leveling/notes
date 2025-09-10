@@ -3,7 +3,7 @@ import Navbar from '../../components/Navbar/Navbar'
 import NoteCard from '../../components/Cards/NoteCard'
 import { MdAdd } from 'react-icons/md'
 import AddEditNote from './AddEditNote'
-import  Modal  from 'react-modal'
+import Modal from 'react-modal'
 import axiosInstance from '../../utils/axiosInstance'
 import { useNavigate } from 'react-router-dom'
 
@@ -14,6 +14,7 @@ const Home = () => {
         data: null
     })
     const [userInfo, setUserInfo] = useState(null)
+    const [getNotes, setAllNotes] = useState([])
     const navigate = useNavigate()
 
     const getUserInfo = async () => {
@@ -31,7 +32,20 @@ const Home = () => {
         } 
     }
 
+    //get All notes
+    const getAllNotes = async () => {
+        try {
+            const response = await axiosInstance.get("/all-notes")
+            if (response.data && response.data.data) {
+                setAllNotes(response.data.data)
+            }
+        } catch (e) {
+            console.log("Unexpected error occurred.Please try again.")
+        }
+    }
+
     useEffect(() => {
+        getAllNotes()
         getUserInfo()
         return () => {}
     }, [])
@@ -41,9 +55,19 @@ const Home = () => {
             <Navbar userInfo={userInfo} />
             <div className='container mx-auto px-10 py-10'>
                 <div className='grid grid-cols-3 gap-4'>
-                <NoteCard title="Part Time Job" date="2025/09/03" content="Ramen Shop" tags="#17:00" isPinned={true}
-                onEdit={()=>{}} onDelete={()=>{}} OnPinNote={()=>{}}
-                />
+                    {getNotes.map((item, index) => (
+                        <NoteCard
+                        key={item._id}
+                        title={item.title}
+                        date={item.createOn}
+                        content={item.content}
+                        tags={item.tags}
+                        isPinned={item.isPinned}
+                        onEdit={() => { }}
+                        onDelete={() => { }}
+                        OnPinNote={() => { }}
+                    />
+                    ))}
                 </div>
             </div> 
             <button className='w-14 h-14 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-6 bottom-6'
@@ -69,7 +93,9 @@ const Home = () => {
                     noteData={openAddEditModal.data}
                     onClose={() => {
                     setAddEditModal({isShown:false, type:"add", data:null })
-            }}/>
+                    }}
+                    getAllNotes={getAllNotes}
+                />
             </Modal>
 
         </>
