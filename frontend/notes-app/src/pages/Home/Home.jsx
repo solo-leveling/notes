@@ -3,11 +3,17 @@ import Navbar from '../../components/Navbar/Navbar'
 import NoteCard from '../../components/Cards/NoteCard'
 import { MdAdd } from 'react-icons/md'
 import AddEditNote from './AddEditNote'
+import Toast from '../../components/ToastMessage/toast'
 import Modal from 'react-modal'
 import axiosInstance from '../../utils/axiosInstance'
 import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
+    const [showToastMsg, setShowToastMsg] = useState({
+        isShown: false,
+        message: '',
+        type: 'add'
+    })
     const [openAddEditModal, setAddEditModal] = useState({
         isShown: false,
         type: "add",
@@ -22,20 +28,37 @@ const Home = () => {
         setAddEditModal({isShown: true, type:"edit", data:noteDetail})
     }
 
+    const showToastMessage = (message, type) => {
+        setShowToastMsg({
+            isShown: true,
+            message,
+            type
+        })
+    }
+
+    const handleCloseToast = () => {
+        setShowToastMsg({
+            isShown: false,
+            message: ""
+        })
+    }
+
     //handle delete note
-    const handleDeleteNote = async () => {
+    const handleDeleteNote = async (data) => {
         try {
-            const noteId = noteData._id
+            const noteId = data._id
             const response = await axiosInstance.delete("/delete-note/"+ noteId )
-            if (response.data && response.data.user) {
-                setUserInfo(response.data.user)
+            if (response.data && response.data.data) {
+                showToastMessage("Note deleted successfully", 'delete')
+                getAllNotes();
+                onClose()    
             }
         } catch (e) {
-            if (e.response.status === 401) {
-                localStorage.clear();
-                navigate("/login")
-            }
-
+                if (error.response && error.response.data && error.response.data.message) {
+                    setError(error.response.data.message)
+                } else {
+                    setError("An unexpected error occurred. Please try again.")
+                }
         } 
     }
 
@@ -70,6 +93,7 @@ const Home = () => {
     useEffect(() => {
         getAllNotes()
         getUserInfo()
+        
         return () => {}
     }, [])
 
@@ -87,7 +111,7 @@ const Home = () => {
                         tags={item.tags}
                         isPinned={item.isPinned}
                         onEdit={() => handleEditNote(item)}
-                        onDelete={() => { }}
+                        onDelete={() => handleDeleteNote(item)}
                         OnPinNote={() => { }}
                     />
                     ))}
@@ -118,8 +142,15 @@ const Home = () => {
                     setAddEditModal({isShown:false, type:"add", data:null })
                     }}
                     getAllNotes={getAllNotes}
+                    showToastMessage = {showToastMessage}
                 />
             </Modal>
+            <Toast
+                isShown = {showToastMsg.isShown}
+                message = {showToastMsg.message}   
+                type = {showToastMsg.type}
+                onClose = {handleCloseToast}
+            />
 
         </>
     )
