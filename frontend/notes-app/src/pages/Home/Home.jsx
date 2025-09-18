@@ -7,6 +7,8 @@ import Toast from '../../components/ToastMessage/toast'
 import Modal from 'react-modal'
 import axiosInstance from '../../utils/axiosInstance'
 import { useNavigate } from 'react-router-dom'
+import EmptyCard from '../../components/EmptyCard/EmptyCard'
+import AddNoteImage from '../../assets/images/add-notes.svg'
 
 const Home = () => {
     const [showToastMsg, setShowToastMsg] = useState({
@@ -99,23 +101,25 @@ const Home = () => {
 
     return (
         <>
-            <Navbar userInfo={userInfo} />
+            <Navbar userInfo={userInfo}/>
             <div className='container mx-auto px-10 py-10'>
-                <div className='grid grid-cols-3 gap-4'>
+                {getNotes.length > 0 ? <div className='grid grid-cols-3 gap-4'>
                     {getNotes.map((item, index) => (
                         <NoteCard
-                        key={item._id}
-                        title={item.title}
-                        date={item.createOn}
-                        content={item.content}
-                        tags={item.tags}
-                        isPinned={item.isPinned}
-                        onEdit={() => handleEditNote(item)}
-                        onDelete={() => handleDeleteNote(item)}
-                        OnPinNote={() => { }}
-                    />
+                            key={item._id}
+                            title={item.title}
+                            date={item.createOn}
+                            content={item.content}
+                            tags={item.tags}
+                            isPinned={item.isPinned}
+                            onEdit={() => handleEditNote(item)}
+                            onDelete={() => handleDeleteNote(item)}
+                            OnPinNote={() => { }}
+                        />
                     ))}
-                </div>
+                </div> : <EmptyCard imgSrc={AddNoteImage}
+                message={`Start Creating Your First Note.`}
+                />}
             </div> 
             <button className='w-14 h-14 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-6 bottom-6'
                 onClick={() => {
