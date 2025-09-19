@@ -5,6 +5,7 @@ const User = require("../models/User");
 const loginUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
     if ((!username && !email) || !password) {
       return res.status(400).json({
         success: false,
@@ -12,16 +13,20 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Find user by username or email
     const user = await User.findOne({
-      $or: [username ? { username } : {}, email ? { email } : {}],
+      $or: [username ? { username } : null, email ? { email } : null].filter(
+        Boolean
+      ), // remove nulls
     });
+
     if (!user) {
       return res.status(400).json({
         success: false,
         message: "User not found",
       });
     }
+    console.log("Request body:", req.body);
+    console.log("Found user:", user);
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
