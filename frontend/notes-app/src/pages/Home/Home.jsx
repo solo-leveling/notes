@@ -6,9 +6,10 @@ import AddEditNote from './AddEditNote'
 import Toast from '../../components/ToastMessage/toast'
 import Modal from 'react-modal'
 import axiosInstance from '../../utils/axiosInstance'
-import { useNavigate } from 'react-router-dom'
+import { data, useNavigate } from 'react-router-dom'
 import EmptyCard from '../../components/EmptyCard/EmptyCard'
 import AddNoteImage from '../../assets/images/add-notes.svg'
+import NoDataImg from '../../assets/images/no-data.svg'
 
 const Home = () => {
     const [showToastMsg, setShowToastMsg] = useState({
@@ -23,6 +24,7 @@ const Home = () => {
     })
     const [userInfo, setUserInfo] = useState(null)
     const [getNotes, setAllNotes] = useState([])
+    const [isSearch, setIsSearch] = useState(false)
     const navigate = useNavigate()
 
     //handle edit note
@@ -92,16 +94,35 @@ const Home = () => {
         }
     }
 
+    const onSearchNote = async (query) => {
+        try {
+            const response = await axiosInstance.get("/search-note", {
+                params: { query },
+            });
+            console.log(response.data.notes)
+            if (response.data && response.data.notes) {
+                setIsSearch(true)
+                setAllNotes(response.data.notes)                
+            }
+        } catch (e) {
+                console.log("Unexpected error occurred.Please try again.")
+        }
+    }
+
+    const handleClearSearch = async () => {
+        setIsSearch(true)
+        getAllNotes()
+    }
+
     useEffect(() => {
         getAllNotes()
         getUserInfo()
-        
         return () => {}
     }, [])
 
     return (
         <>
-            <Navbar userInfo={userInfo}/>
+            <Navbar userInfo={userInfo} onSearchNote={ onSearchNote } handleClearSearch={handleClearSearch} />
             <div className='container mx-auto px-10 py-10'>
                 {getNotes.length > 0 ? <div className='grid grid-cols-3 gap-4'>
                     {getNotes.map((item, index) => (
@@ -117,8 +138,10 @@ const Home = () => {
                             OnPinNote={() => { }}
                         />
                     ))}
-                </div> : <EmptyCard imgSrc={AddNoteImage}
-                message={`Start Creating Your First Note.`}
+                </div> : <EmptyCard
+                    
+                imgSrc={isSearch ? NoDataImg : AddNoteImage}
+                message={isSearch ? `Oops! No data found.` : `Start Creating Your First Note.`}
                 />}
             </div> 
             <button className='w-14 h-14 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-6 bottom-6'
