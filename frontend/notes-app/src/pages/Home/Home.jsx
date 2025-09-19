@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar/Navbar'
 import NoteCard from '../../components/Cards/NoteCard'
 import { MdAdd } from 'react-icons/md'
+import { BiLoaderCircle } from 'react-icons/bi';
 import AddEditNote from './AddEditNote'
 import Toast from '../../components/ToastMessage/toast'
 import Modal from 'react-modal'
@@ -23,8 +24,9 @@ const Home = () => {
         data: null
     })
     const [userInfo, setUserInfo] = useState(null)
-    const [getNotes, setAllNotes] = useState([])
+    const [getNotes, setAllNotes] = useState(null)
     const [isSearch, setIsSearch] = useState(false)
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate()
 
     //handle edit note
@@ -78,7 +80,6 @@ const Home = () => {
                 localStorage.clear();
                 navigate("/login")
             }
-
         } 
     }
 
@@ -88,9 +89,13 @@ const Home = () => {
             const response = await axiosInstance.get("/all-notes")
             if (response.data && response.data.data) {
                 setAllNotes(response.data.data)
+            }else {
+                setAllNotes([]); // empty if nothing
             }
         } catch (e) {
             console.log("Unexpected error occurred.Please try again.")
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -114,17 +119,40 @@ const Home = () => {
         getAllNotes()
     }
 
+    const isPinned = async (noteData) => {
+        const noteId = noteData._id
+        try {
+            const response = await axiosInstance.put("/edit-pin/" + noteId, {
+                isPinned : !noteData.isPinned
+            })
+            if (response.data && response.data.data) {
+                showToastMessage("Note updated successfully")
+                getAllNotes();    
+            }
+        } catch (e) {
+                console.log(e)
+        }
+    }
+
+
     useEffect(() => {
         getAllNotes()
         getUserInfo()
         return () => {}
     }, [])
+    
 
     return (
         <>
             <Navbar userInfo={userInfo} onSearchNote={ onSearchNote } handleClearSearch={handleClearSearch} />
             <div className='container mx-auto px-10 py-10'>
-                {getNotes.length > 0 ? <div className='grid grid-cols-3 gap-4'>
+                {loading ? (
+                <div className="flex items-center justify-center h-100 ">
+                <BiLoaderCircle className="animate-spin" size={50} />
+                <p className="ml-2 text-xl font-semibold text-gray-700">Loading...</p>
+            </div>
+                    ) :getNotes && getNotes.length > 0 ?
+                <div className='grid grid-cols-3 gap-4'>
                     {getNotes.map((item, index) => (
                         <NoteCard
                             key={item._id}
@@ -135,11 +163,10 @@ const Home = () => {
                             isPinned={item.isPinned}
                             onEdit={() => handleEditNote(item)}
                             onDelete={() => handleDeleteNote(item)}
-                            OnPinNote={() => { }}
+                            OnPinNote={() => {isPinned(item)}}
                         />
                     ))}
-                </div> : <EmptyCard
-                    
+                </div> : <EmptyCard    
                 imgSrc={isSearch ? NoDataImg : AddNoteImage}
                 message={isSearch ? `Oops! No data found.` : `Start Creating Your First Note.`}
                 />}
