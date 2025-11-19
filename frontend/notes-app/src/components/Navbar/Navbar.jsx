@@ -31,6 +31,7 @@ const Navbar = ( { userInfo, onSearchNote, handleClearSearch } ) => {
                     onChange={({ target }) => {
                         setQuerySearch(target.value);
                     }}
+                    userInfo={userInfo}
                     handleSearch={handleSearch}
                     clearSearch={clearSearch}
                 />
