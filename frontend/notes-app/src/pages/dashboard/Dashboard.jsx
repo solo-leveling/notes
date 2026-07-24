@@ -18,10 +18,10 @@ const fetchNotes = async () => {
 };
 
 const Dashboard = () => {
-  const { data: notes = [], isLoading } = useQuery(
-    ["dashboard-notes"],
-    fetchNotes,
-  );
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ["dashboard-notes"],
+    queryFn: fetchNotes,
+  });
   const { user } = useAuth();
 
   const summary = useMemo(() => {

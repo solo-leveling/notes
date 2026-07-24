@@ -8,7 +8,7 @@ import {
   List,
   Plus,
   Trash2,
-  Star,
+  Pin,
   Zap,
 } from "lucide-react";
 import axiosInstance from "../../utils/axiosInstance";
@@ -23,7 +23,9 @@ const fetchNotes = async () => {
 const Notes = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { data: notes = [], isLoading } = useQuery(["notes"], fetchNotes, {
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ["notes"],
+    queryFn: fetchNotes,
     staleTime: 1000 * 30,
   });
   const [search, setSearch] = useState("");
@@ -52,14 +54,14 @@ const Notes = () => {
 
   const handleDelete = async (id) => {
     await axiosInstance.delete(`/delete-note/${id}`);
-    queryClient.invalidateQueries(["notes"]);
+    queryClient.invalidateQueries({ queryKey: ["notes"] });
   };
 
   const handlePin = async (note) => {
     await axiosInstance.put(`/edit-pin/${note._id}`, {
       isPinned: !note.isPinned,
     });
-    queryClient.invalidateQueries(["notes"]);
+    queryClient.invalidateQueries({ queryKey: ["notes"] });
   };
 
   return (

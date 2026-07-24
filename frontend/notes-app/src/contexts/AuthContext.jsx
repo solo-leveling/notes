@@ -14,22 +14,23 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     isError,
     refetch,
-  } = useQuery(
-    ["user"],
-    async () => {
+  } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
       const response = await axiosInstance.get("/get-user");
       return response.data.user;
     },
-    {
-      enabled: !!token,
-      staleTime: 1000 * 60,
-      retry: false,
-      onError: () => {
-        setToken(null);
-        localStorage.removeItem(STORAGE_KEY);
-      },
-    },
-  );
+    enabled: !!token,
+    staleTime: 1000 * 60,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (isError) {
+      setToken(null);
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [isError]);
 
   useEffect(() => {
     if (token) {
@@ -41,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (accessToken) => {
     setToken(accessToken);
-    queryClient.invalidateQueries(["user"]);
+    queryClient.invalidateQueries({ queryKey: ["user"] });
   };
 
   const logout = () => {

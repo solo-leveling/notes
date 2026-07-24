@@ -1,5 +1,4 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useTheme } from "../../hooks/useTheme.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import {

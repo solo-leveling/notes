@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,16 +25,20 @@ const NoteEditor = () => {
     defaultValues: { title: "", content: "", tags: "" },
   });
 
-  const noteQuery = useQuery(["note", noteId], () => fetchNote(noteId), {
+  const noteQuery = useQuery({
+    queryKey: ["note", noteId],
+    queryFn: () => fetchNote(noteId),
     enabled: !!noteId,
-    onSuccess: (note) => {
-      if (note) {
-        setValue("title", note.title);
-        setValue("content", note.content);
-        setValue("tags", (note.tags || []).join(", "));
-      }
-    },
   });
+
+  useEffect(() => {
+    const note = noteQuery.data;
+    if (note) {
+      setValue("title", note.title);
+      setValue("content", note.content);
+      setValue("tags", (note.tags || []).join(", "));
+    }
+  }, [noteQuery.data, setValue]);
 
   const content = watch("content");
   const title = watch("title");
@@ -42,19 +46,17 @@ const NoteEditor = () => {
 
   const debouncedContent = useDebounce(content, 400);
 
-  const saveMutation = useMutation(
-    async (payload) => {
+  const saveMutation = useMutation({
+    mutationFn: async (payload) => {
       if (noteId) {
         return axiosInstance.put(`/edit-note/${noteId}`, payload);
       }
       return axiosInstance.post("/add-note", payload);
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["notes"]);
-      },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
-  );
+  });
 
   useEffect(() => {
     if (!noteId) return;
@@ -170,7 +172,7 @@ const NoteEditor = () => {
           <div className="rounded-3xl border border-surface bg-surface p-4">
             <p className="text-sm text-muted">Auto-save</p>
             <p className="mt-3 text-base font-semibold">
-              {saveMutation.isLoading ? "Saving..." : "Saved"}
+              {saveMutation.isPending ? "Saving..." : "Saved"}
             </p>
             <div className="mt-4 flex items-center gap-2 text-sm text-muted">
               <Sparkles size={16} />
