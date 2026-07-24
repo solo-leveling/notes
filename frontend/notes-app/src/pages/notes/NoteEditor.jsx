@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +15,7 @@ const NoteEditor = () => {
   const { noteId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [savedNoteId, setSavedNoteId] = useState(noteId || null);
   const {
     register,
     handleSubmit,
@@ -48,12 +49,16 @@ const NoteEditor = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (payload) => {
-      if (noteId) {
-        return axiosInstance.put(`/edit-note/${noteId}`, payload);
+      if (savedNoteId) {
+        return axiosInstance.put(`/edit-note/${savedNoteId}`, payload);
       }
       return axiosInstance.post("/add-note", payload);
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
+      const createdId = response?.data?.note?._id;
+      if (createdId && !savedNoteId) {
+        setSavedNoteId(createdId);
+      }
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
@@ -66,7 +71,7 @@ const NoteEditor = () => {
   }, [noteId, noteQuery, navigate]);
 
   useEffect(() => {
-    if (isDirty) {
+    if (isDirty && !saveMutation.isPending) {
       saveMutation.mutate({
         title,
         content,
@@ -118,7 +123,8 @@ const NoteEditor = () => {
         <button
           type="button"
           onClick={handleSubmit(onSubmit)}
-          className="button-primary inline-flex items-center gap-2"
+          disabled={saveMutation.isPending}
+          className="button-primary inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save size={16} /> Save
         </button>
