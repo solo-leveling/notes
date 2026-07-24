@@ -1,0 +1,15 @@
+# Node dependencies
+node_modules/
+
+# Vite build output
+dist/
+
+# Editor and system files
+.DS_Store
+Thumbs.db
+
+# Temporary directories
+*.log
+
+# AI tooling
+.claude/
