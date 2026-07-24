@@ -29,13 +29,13 @@ const Profile = () => {
           <div className="space-y-4 text-sm text-muted">
             <div>
               <p className="text-xs uppercase tracking-[0.22em]">Email</p>
-              <p className="mt-2 text-base text-slate-900">{user?.email}</p>
+              <p className="mt-2 text-base text-[var(--text)]">{user?.email}</p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.22em]">
                 Account created
               </p>
-              <p className="mt-2 text-base text-slate-900">
+              <p className="mt-2 text-base text-[var(--text)]">
                 {new Date(user?.createdAt).toLocaleDateString()}
               </p>
             </div>

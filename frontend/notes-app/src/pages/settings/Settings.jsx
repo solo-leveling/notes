@@ -61,7 +61,7 @@ const Settings = () => {
                   type="checkbox"
                   checked={notifications}
                   onChange={() => setNotifications((prev) => !prev)}
-                  className="h-5 w-5 rounded border-slate-300 text-primary"
+                  className="h-5 w-5 rounded border-[var(--border)] text-primary"
                 />
               </label>
             </div>

@@ -78,7 +78,7 @@ const AppShell = () => {
             <button
               type="button"
               onClick={logout}
-              className="mt-4 w-full rounded-2xl border border-surface bg-transparent py-3 text-sm font-semibold text-muted transition hover:bg-slate-50"
+              className="mt-4 w-full rounded-2xl border border-surface bg-transparent py-3 text-sm font-semibold text-muted transition hover:bg-[var(--surface)]"
             >
               Log out
             </button>

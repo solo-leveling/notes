@@ -88,7 +88,13 @@
 
 @layer components {
   .input-base {
-    @apply w-full rounded-2xl border border-slate-200 bg-transparent px-4 py-3 text-sm text-slate-900 outline-none transition duration-200;
+    @apply w-full rounded-2xl border bg-transparent px-4 py-3 text-sm outline-none transition duration-200;
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  .input-base::placeholder {
+    color: var(--muted);
   }
 
   .input-base:focus {
@@ -106,6 +112,12 @@
   }
 
   .button-ghost {
-    @apply inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-transparent px-4 py-2 text-sm font-medium text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-50;
+    @apply inline-flex items-center justify-center rounded-2xl border bg-transparent px-4 py-2 text-sm font-medium transition duration-200;
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  .button-ghost:hover {
+    background-color: var(--surface);
   }
 }

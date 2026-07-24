@@ -126,7 +126,7 @@ const NoteEditor = () => {
 
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-800">
+          <label className="mb-2 block text-sm font-medium text-[var(--text)]">
             Title
           </label>
           <input
@@ -141,7 +141,7 @@ const NoteEditor = () => {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-800">
+          <label className="mb-2 block text-sm font-medium text-[var(--text)]">
             Content
           </label>
           <textarea
@@ -159,7 +159,7 @@ const NoteEditor = () => {
 
         <div className="grid gap-4 sm:grid-cols-[1.5fr,1fr]">
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-800">
+            <label className="mb-2 block text-sm font-medium text-[var(--text)]">
               Tags
             </label>
             <input
