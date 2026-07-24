@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -23,6 +24,7 @@ const Dashboard = () => {
     queryFn: fetchNotes,
   });
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const summary = useMemo(() => {
     const pinned = notes.filter((note) => note.isPinned).length;
@@ -54,6 +56,7 @@ const Dashboard = () => {
           </div>
           <button
             type="button"
+            onClick={() => navigate("/notes/new")}
             className="button-primary inline-flex items-center gap-2 self-start"
           >
             <Plus size={18} /> Create note
@@ -98,6 +101,7 @@ const Dashboard = () => {
             </div>
             <button
               type="button"
+              onClick={() => navigate("/notes")}
               className="button-ghost inline-flex items-center gap-2"
             >
               <Search size={16} /> Search
@@ -113,7 +117,15 @@ const Dashboard = () => {
               summary.recentNotes.map((note) => (
                 <div
                   key={note._id}
-                  className="rounded-3xl border border-surface p-4 transition hover:border-primary/30 hover:bg-surface"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate(`/notes/${note._id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      navigate(`/notes/${note._id}`);
+                    }
+                  }}
+                  className="cursor-pointer rounded-3xl border border-surface p-4 transition hover:border-primary/30 hover:bg-surface"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>

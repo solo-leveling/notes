@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useTheme } from "../../hooks/useTheme.jsx";
+import ConfirmDialog from "../../components/ui/ConfirmDialog.jsx";
 
 const Settings = () => {
   const { theme, toggleTheme } = useTheme();
   const [language, setLanguage] = useState("English");
   const [notifications, setNotifications] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   return (
     <section className="rounded-[28px] border border-surface bg-card p-8 shadow-soft">
@@ -69,16 +71,26 @@ const Settings = () => {
         </div>
       </div>
 
-      <div className="mt-8 rounded-[28px] border border-rose-200 bg-rose-50 p-6">
-        <p className="text-sm font-semibold text-rose-700">Danger zone</p>
+      <div className="mt-8 rounded-[28px] border border-rose-500/30 bg-rose-500/10 p-6">
+        <p className="text-sm font-semibold text-rose-500">Danger zone</p>
         <p className="mt-2 text-sm text-muted">This action cannot be undone.</p>
         <button
           type="button"
-          className="button-ghost mt-4 text-rose-600 hover:bg-rose-100"
+          onClick={() => setShowDeleteConfirm(true)}
+          className="button-ghost mt-4 border-rose-500/30 text-rose-500 hover:bg-rose-500/10"
         >
           Delete account
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Account deletion isn't available yet"
+        message="This feature is still being built. Please contact support if you need your account or data removed in the meantime."
+        confirmLabel="Got it"
+        hideCancel
+        onConfirm={() => setShowDeleteConfirm(false)}
+      />
     </section>
   );
 };

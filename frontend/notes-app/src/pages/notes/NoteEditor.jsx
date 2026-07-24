@@ -136,7 +136,7 @@ const NoteEditor = () => {
             placeholder="Add a title"
           />
           {errors.title && (
-            <p className="mt-2 text-sm text-rose-600">{errors.title.message}</p>
+            <p className="mt-2 text-sm text-rose-500">{errors.title.message}</p>
           )}
         </div>
 
@@ -151,7 +151,7 @@ const NoteEditor = () => {
             placeholder="Write your note..."
           />
           {errors.content && (
-            <p className="mt-2 text-sm text-rose-600">
+            <p className="mt-2 text-sm text-rose-500">
               {errors.content.message}
             </p>
           )}

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useTheme } from "../../hooks/useTheme.jsx";
 import { registerUser } from "../../services/authService.js";
-import { Mail, Lock, User, Eye, EyeOff, NotebookPen, Sparkles, ShieldCheck } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, NotebookPen, Sparkles, ShieldCheck, Sun, Moon } from "lucide-react";
 
 const highlights = [
   { icon: Sparkles, text: "Auto-saving notes with instant search" },
@@ -10,6 +11,7 @@ const highlights = [
 ];
 
 const Register = () => {
+  const { toggleTheme, isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -72,7 +74,16 @@ const Register = () => {
         </p>
       </aside>
 
-      <div className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+      <div className="relative flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-surface text-muted transition hover:border-primary hover:text-primary sm:right-6 sm:top-6"
+          aria-label="Toggle theme"
+        >
+          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center gap-2 text-lg font-semibold lg:hidden">
             <NotebookPen size={22} className="text-primary" />

@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import { useTheme } from "../../hooks/useTheme.jsx";
 import { loginUser } from "../../services/authService.js";
-import { Eye, EyeOff, Lock, Mail, NotebookPen, Sparkles, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, NotebookPen, Sparkles, ShieldCheck, Sun, Moon } from "lucide-react";
 
 const highlights = [
   { icon: Sparkles, text: "Auto-saving notes with instant search" },
@@ -12,9 +13,11 @@ const highlights = [
 
 const Login = () => {
   const { login } = useAuth();
+  const { toggleTheme, isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showForgotNotice, setShowForgotNotice] = useState(false);
   const {
     register,
     handleSubmit,
@@ -79,7 +82,16 @@ const Login = () => {
         </p>
       </aside>
 
-      <div className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+      <div className="relative flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-surface text-muted transition hover:border-primary hover:text-primary sm:right-6 sm:top-6"
+          aria-label="Toggle theme"
+        >
+          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center gap-2 text-lg font-semibold lg:hidden">
             <NotebookPen size={22} className="text-primary" />
@@ -166,11 +178,19 @@ const Login = () => {
               </label>
               <button
                 type="button"
+                onClick={() => setShowForgotNotice((prev) => !prev)}
                 className="font-medium text-primary hover:text-[var(--primary-strong)]"
               >
                 Forgot password?
               </button>
             </div>
+
+            {showForgotNotice && (
+              <p className="rounded-2xl border border-surface bg-[var(--surface)] px-4 py-3 text-sm text-muted">
+                Password reset isn&rsquo;t available yet. Please contact
+                support to regain access to your account.
+              </p>
+            )}
 
             {errorMessage && (
               <p

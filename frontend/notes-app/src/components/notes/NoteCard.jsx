@@ -62,7 +62,7 @@ const NoteCard = ({ note, viewMode, onEdit, onDelete, onPin }) => {
         <button
           type="button"
           onClick={onDelete}
-          className="button-ghost inline-flex items-center gap-2 text-rose-600 hover:text-rose-700"
+          className="button-ghost inline-flex items-center gap-2 text-rose-500 hover:text-rose-600"
         >
           <Trash2 size={16} /> Delete
         </button>

@@ -14,11 +14,19 @@ import {
 import axiosInstance from "../../utils/axiosInstance";
 import EmptyState from "../../components/ui/EmptyState.jsx";
 import NoteCard from "../../components/notes/NoteCard.jsx";
+import ConfirmDialog from "../../components/ui/ConfirmDialog.jsx";
 
 const fetchNotes = async () => {
   const response = await axiosInstance.get("/all-notes");
   return response.data.data || [];
 };
+
+const toggleButtonClass = (isActive) =>
+  `inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-2 text-sm font-medium transition duration-200 ${
+    isActive
+      ? "border-primary bg-primary text-white"
+      : "border-surface text-[var(--text)] hover:bg-[var(--surface)]"
+  }`;
 
 const Notes = () => {
   const queryClient = useQueryClient();
@@ -31,6 +39,7 @@ const Notes = () => {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("updated");
+  const [pendingDelete, setPendingDelete] = useState(null);
 
   const filteredNotes = useMemo(() => {
     const normalized = search.toLowerCase();
@@ -83,7 +92,9 @@ const Notes = () => {
           </button>
           <button
             type="button"
-            className="button-ghost inline-flex items-center gap-2"
+            disabled
+            title="Archive is coming soon"
+            className="button-ghost inline-flex cursor-not-allowed items-center gap-2 opacity-50"
           >
             <Trash2 size={16} /> Archive
           </button>
@@ -104,10 +115,10 @@ const Notes = () => {
                 aria-label="Search notes"
               />
             </div>
-            <div className="grid grid-cols-3 gap-3 sm:w-[260px]">
+            <div className="grid grid-cols-2 gap-3 sm:w-[180px]">
               <button
                 type="button"
-                className="button-ghost inline-flex items-center justify-center gap-2"
+                className={toggleButtonClass(viewMode === "grid")}
                 onClick={() => setViewMode("grid")}
                 aria-pressed={viewMode === "grid"}
               >
@@ -115,7 +126,7 @@ const Notes = () => {
               </button>
               <button
                 type="button"
-                className="button-ghost inline-flex items-center justify-center gap-2"
+                className={toggleButtonClass(viewMode === "list")}
                 onClick={() => setViewMode("list")}
                 aria-pressed={viewMode === "list"}
               >
@@ -127,22 +138,25 @@ const Notes = () => {
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              className="button-ghost inline-flex items-center gap-2"
+              className={toggleButtonClass(sortBy === "updated")}
               onClick={() => setSortBy("updated")}
+              aria-pressed={sortBy === "updated"}
             >
               Updated
             </button>
             <button
               type="button"
-              className="button-ghost inline-flex items-center gap-2"
+              className={toggleButtonClass(sortBy === "pinned")}
               onClick={() => setSortBy("pinned")}
+              aria-pressed={sortBy === "pinned"}
             >
               <Pin size={16} /> Pinned
             </button>
             <button
               type="button"
-              className="button-ghost inline-flex items-center gap-2"
+              className={toggleButtonClass(sortBy === "title")}
               onClick={() => setSortBy("title")}
+              aria-pressed={sortBy === "title"}
             >
               <Zap size={16} /> Title
             </button>
@@ -164,7 +178,7 @@ const Notes = () => {
                   note={note}
                   viewMode={viewMode}
                   onEdit={() => navigate(`/notes/${note._id}`)}
-                  onDelete={() => handleDelete(note._id)}
+                  onDelete={() => setPendingDelete(note)}
                   onPin={() => handlePin(note)}
                 />
               ))
@@ -196,6 +210,18 @@ const Notes = () => {
           </div>
         </aside>
       </div>
+
+      <ConfirmDialog
+        isOpen={Boolean(pendingDelete)}
+        title="Delete note"
+        message={`Are you sure you want to delete "${pendingDelete?.title}"? This can't be undone.`}
+        confirmLabel="Delete"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={async () => {
+          await handleDelete(pendingDelete._id);
+          setPendingDelete(null);
+        }}
+      />
     </section>
   );
 };
